@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Weekly class schedule, notes and homework tracker">
+<meta name="theme-color" content="#0c0e13">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TFIG 248">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>TFIG 248 — Dars Jadvali</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --shell-bg:#0c0e13;
+    --shell-text:#eef1f6;
+    --shell-dim:#8b93a3;
+    --font-head:'PT Serif', Georgia, serif;
+    --font-body:'PT Sans', Arial, sans-serif;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  button{
+    -webkit-tap-highlight-color:transparent;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    user-select:none;
+    touch-action:manipulation;
+    appearance:none;
+    -webkit-appearance:none;
+  }
+  button:active{opacity:.8;}
+  body{
+    background:var(--shell-bg);
+    color:var(--shell-text);
+    font-family:var(--font-body);
+    min-height:100vh;
+    min-height:100dvh;
+    -webkit-text-size-adjust:100%;
+  }
+  .app{max-width:640px;margin:0 auto;padding-bottom:calc(2rem + env(safe-area-inset-bottom));}
+
+  header{padding:1.75rem 1.25rem .5rem;text-align:center;}
+  .lang-switch{display:flex;justify-content:center;gap:.4rem;margin-bottom:1rem;}
+  .lang-switch button{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.16);
+    color:var(--shell-dim);
+    padding:.5rem .9rem;
+    border-radius:999px;
+    font-family:var(--font-body);
+    font-size:.72rem;
+    font-weight:700;
+    letter-spacing:.04em;
+    cursor:pointer;
+  }
+  .lang-switch button.active{background:var(--shell-text);color:var(--shell-bg);border-color:var(--shell-text);}
+  header h1{
+    font-family:var(--font-head);
+    font-weight:700;
+    font-size:1.45rem;
+    line-height:1.25;
+    margin:.2rem 0 .4rem;
+  }
+  header .subtitle{color:var(--shell-dim);font-size:.92rem;margin:0;line-height:1.4;}
+
+  #restBanner{
+    display:none;
+    margin:1rem 1.25rem 0;
+    padding:1rem 1.25rem;
+    background:linear-gradient(135deg,#1c2333,#2a3348);
+    border-radius:16px;
+    text-align:center;
+  }
+  #restBanner strong{display:block;font-family:var(--font-head);font-size:1.05rem;margin-bottom:.3rem;}
+  #restBanner p{margin:0;color:var(--shell-dim);font-size:.87rem;line-height:1.4;}
+
+  .day-tabs{
+    display:flex;
+    gap:.3rem;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:1.1rem 1.25rem 0;
+    scrollbar-width:none;
+  }
+  .day-tabs::-webkit-scrollbar{display:none;}
+  .day-tab{
+    flex:0 0 auto;
+    padding:.55rem 1rem;
+    border-radius:10px 10px 0 0;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.045);
+    color:var(--tab-c,var(--shell-dim));
+    font-family:var(--font-head);
+    font-weight:700;
+    font-size:.82rem;
+    cursor:pointer;
+    white-space:nowrap;
+    position:relative;
+  }
+  .day-tab.active{background:var(--tab-c);color:#0c0e13;border-color:var(--tab-c);}
+  .day-tab.is-today:not(.active)::after{
+    content:'';
+    position:absolute;top:-4px;right:-3px;
+    width:7px;height:7px;border-radius:50%;
+    background:#4ade80;
+    box-shadow:0 0 0 2px var(--shell-bg);
+  }
+
+  .day-panel{
+    position:relative;
+    margin:0 1.25rem 1.5rem;
+    padding:1.6rem 1.25rem 1.9rem;
+    border-radius:0 var(--radius) var(--radius) var(--radius);
+    overflow:hidden;
+    color:#fff;
+  }
+  .panel-icon{
+    position:absolute;
+    top:-18px;right:-22px;
+    width:170px;height:170px;
+    color:var(--accent,#fff);
+    opacity:.16;
+    pointer-events:none;
+  }
+  .panel-header{position:relative;margin-bottom:1.1rem;}
+  .panel-header h2{font-family:var(--font-head);font-size:1.5rem;margin:0 0 .3rem;}
+  .panel-header .loc{font-size:.85rem;color:rgba(255,255,255,.78);margin:0;}
+
+  .subjects{position:relative;display:flex;flex-wrap:wrap;gap:.7rem;margin-bottom:1.3rem;}
+  .subject-card{
+    flex:1 1 170px;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:14px;
+    padding:.8rem 1rem;
+    -webkit-backdrop-filter:blur(6px);
+    backdrop-filter:blur(6px);
+  }
+  .subject-card h3{margin:0 0 .35rem;font-family:var(--font-head);font-size:1.05rem;}
+  .subject-card .t1{margin:0;font-size:.87rem;color:rgba(255,255,255,.92);}
+  .subject-card .t2{margin:.15rem 0 0;font-size:.78rem;color:rgba(255,255,255,.68);}
+
+  .entry-form{
+    position:relative;
+    background:rgba(0,0,0,.24);
+    border-radius:16px;
+    padding:1rem 1rem 1.1rem;
+    margin-bottom:1.3rem;
+  }
+  .entry-form label{
+    display:block;
+    font-size:.78rem;
+    font-weight:700;
+    color:rgba(255,255,255,.82);
+    margin:.55rem 0 .3rem;
+  }
+  .entry-form label:first-child{margin-top:0;}
+  .entry-form input[type="date"],
+  .entry-form input[type="text"],
+  .entry-form textarea{
+    width:100%;
+    background:rgba(255,255,255,.09);
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:10px;
+    color:#fff;
+    padding:.6rem .7rem;
+    font-family:var(--font-body);
+    font-size:16px;
+  }
+  .entry-form textarea{min-height:72px;resize:vertical;line-height:1.4;}
+  .entry-form input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(1);cursor:pointer;}
+  .btn-save{
+    margin-top:.9rem;
+    background:var(--accent,#fff);
+    color:#0c0e13;
+    border:none;
+    font-family:var(--font-body);
+    font-weight:700;
+    padding:.6rem 1.5rem;
+    border-radius:999px;
+    cursor:pointer;
+    font-size:.88rem;
+  }
+
+  .history-title{position:relative;font-family:var(--font-head);font-size:1.05rem;margin:0 0 .7rem;color:rgba(255,255,255,.92);}
+  .entries-list{position:relative;display:flex;flex-direction:column;gap:.6rem;}
+  .entry-card{
+    position:relative;
+    background:rgba(0,0,0,.24);
+    border-radius:12px;
+    padding:.8rem 2.5rem .8rem 1rem;
+    font-size:.86rem;
+    line-height:1.45;
+  }
+  .entry-top{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.4rem;}
+  .entry-date{font-weight:700;color:var(--accent,#fff);font-family:var(--font-head);}
+  .score-badge{background:var(--accent,#fff);color:#0c0e13;font-weight:700;font-size:.76rem;padding:.18rem .6rem;border-radius:999px;white-space:nowrap;font-family:var(--font-body);}
+  .entry-field{margin-bottom:.2rem;}
+  .entry-field b{color:rgba(255,255,255,.88);font-weight:700;}
+  .entry-field span{color:rgba(255,255,255,.92);}
+  .no-entries{position:relative;color:rgba(255,255,255,.62);font-style:italic;font-size:.86rem;margin:0;}
+  .delete-btn{
+    position:absolute;top:.5rem;right:.5rem;
+    width:32px;height:32px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,.16);
+    color:#fff;
+    cursor:pointer;
+    font-size:1rem;
+    line-height:1;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  footer{display:flex;justify-content:center;gap:.6rem;padding:.5rem 1.25rem 0;flex-wrap:wrap;}
+  footer button,footer label{
+    background:rgba(255,255,255,.055);
+    border:1px solid rgba(255,255,255,.18);
+    color:var(--shell-dim);
+    padding:.55rem 1rem;
+    border-radius:999px;
+    font-family:var(--font-body);
+    font-size:.78rem;
+    font-weight:700;
+    cursor:pointer;
+    margin:0;
+  }
+
+  #toast{
+    position:fixed;bottom:1.4rem;left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:#4ade80;color:#052e12;
+    padding:.6rem 1.3rem;border-radius:999px;
+    font-family:var(--font-body);font-weight:700;font-size:.85rem;
+    opacity:0;transition:opacity .25s ease, transform .25s ease;
+    pointer-events:none;
+    z-index:50;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  [data-theme="monday"]{--accent:#5eead4;background:linear-gradient(160deg,#0a2c2a 0%,#0f4c46 55%,#0d6d63 100%);}
+  [data-theme="tuesday"]{--accent:#fb7185;background:linear-gradient(160deg,#3f0f2e 0%,#7a1e6b 45%,#4338ca 100%);}
+  [data-theme="wednesday"]{--accent:#fbbf24;background:linear-gradient(160deg,#3d0a0a 0%,#6d1414 50%,#8a2a1f 100%);}
+  [data-theme="thursday"]{--accent:#a3e635;background:linear-gradient(160deg,#1a1033 0%,#3f1f6b 50%,#14532d 100%);}
+  [data-theme="friday"]{--accent:#7dd3fc;background:linear-gradient(160deg,#062a3f 0%,#0c5478 50%,#1691c7 100%);}
+  [data-theme="saturday"]{--accent:#fdba74;background:linear-gradient(160deg,#4a1607 0%,#8a2e0d 50%,#c2540f 100%);}
+
+  .day-tab[data-theme="monday"]{--tab-c:#5eead4;}
+  .day-tab[data-theme="tuesday"]{--tab-c:#fb7185;}
+  .day-tab[data-theme="wednesday"]{--tab-c:#fbbf24;}
+  .day-tab[data-theme="thursday"]{--tab-c:#a3e635;}
+  .day-tab[data-theme="friday"]{--tab-c:#7dd3fc;}
+  .day-tab[data-theme="saturday"]{--tab-c:#fdba74;}
+
+  @media (max-width:400px){
+    header h1{font-size:1.25rem;}
+    .day-panel{padding:1.3rem 1rem 1.6rem;}
+    .panel-icon{width:130px;height:130px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="lang-switch">
+      <button data-lang="en" type="button">EN</button>
+      <button data-lang="uz" type="button">UZ</button>
+      <button data-lang="ru" type="button">RU</button>
+    </div>
+    <h1 data-i18n="appTitle"></h1>
+    <p class="subtitle" data-i18n="appSubtitle"></p>
+  </header>
+
+  <div id="restBanner"></div>
+
+  <nav class="day-tabs" id="dayTabs"></nav>
+  <main class="day-panel" id="dayPanel"></main>
+
+  <footer>
+    <button id="exportBtn" data-i18n="export" type="button"></button>
+    <label class="import-label" data-i18n="import" for="importInput"></label>
+    <input type="file" id="importInput" accept="application/json" hidden>
+  </footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+
+  var SCHEDULE = {
+    monday:    { location:"chorguzar",    subjects:[{key:"biochemistry",    start:"8:00",  end:"10:50", periods:2}] },
+    tuesday:   { location:"chorguzar",    subjects:[{key:"histology",       start:"8:00",  end:"10:50", periods:2},
+                                                     {key:"psychology",      start:"11:50", end:"13:20", periods:2}] },
+    wednesday: { location:"mainBuilding", subjects:[{key:"humanAnatomy",    start:"8:00",  end:"10:50", periods:2}] },
+    thursday:  { location:"chorguzar",    subjects:[{key:"microbiology",    start:"8:00",  end:"10:50", periods:2}] },
+    friday:    { location:"chorguzar",    subjects:[{key:"hygiene",         start:"8:00",  end:"10:50", periods:2}] },
+    saturday:  { location:"mainBuilding", subjects:[{key:"normalPhysiology",start:"8:00",  end:"10:50", periods:2}] }
+  };
+
+  var DAY_ORDER = ["monday","tuesday","wednesday","thursday","friday","saturday"];
+
+  var ICONS = {
+    monday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="28" r="9"/><circle cx="70" cy="28" r="9"/><circle cx="50" cy="62" r="9"/><circle cx="18" cy="66" r="6"/><circle cx="82" cy="66" r="6"/><line x1="30" y1="28" x2="70" y2="28"/><line x1="30" y1="28" x2="50" y2="62"/><line x1="70" y1="28" x2="50" y2="62"/><line x1="50" y1="62" x2="18" y2="66"/><line x1="50" y1="62" x2="82" y2="66"/></svg>',
+    tuesday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5"><circle cx="35" cy="32" r="22"/><circle cx="35" cy="32" r="6" fill="currentColor" stroke="none"/><circle cx="70" cy="55" r="18"/><circle cx="70" cy="55" r="5" fill="currentColor" stroke="none"/><circle cx="32" cy="75" r="13"/><circle cx="32" cy="75" r="4" fill="currentColor" stroke="none"/></svg>',
+    wednesday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"><path d="M50 88 C22 64 6 44 6 27 C6 11 20 2 33 6 C43 9 49 18 50 26 C51 18 57 9 67 6 C80 2 94 11 94 27 C94 44 78 64 50 88 Z"/></svg>',
+    thursday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><ellipse cx="32" cy="38" rx="20" ry="13" transform="rotate(-18 32 38)"/><ellipse cx="68" cy="60" rx="15" ry="10" transform="rotate(20 68 60)"/><circle cx="78" cy="26" r="7"/><line x1="18" y1="30" x2="8" y2="20"/><line x1="20" y1="42" x2="8" y2="48"/><line x1="60" y1="72" x2="55" y2="82"/></svg>',
+    friday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"><path d="M50 6 C50 6 78 46 78 66 C78 84 65 94 50 94 C35 94 22 84 22 66 C22 46 50 6 50 6 Z"/><line x1="78" y1="20" x2="86" y2="20"/><line x1="82" y1="16" x2="82" y2="24"/></svg>',
+    saturday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,54 24,54 32,32 42,74 52,18 60,54 96,54"/></svg>'
+  };
+
+  var EMOJI = { learned:"📚", homework:"📝", score:"🎯" };
+
+  var MONTHS = {
+    en:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+    uz:["Yan","Fev","Mar","Apr","May","Iyun","Iyul","Avg","Sen","Okt","Noy","Dek"],
+    ru:["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"]
+  };
+
+  var I18N = {
+    en:{
+      appTitle:"Weekly Class Schedule of TFIG 248 🥼📚",
+      appSubtitle:"Track your classes, jot down what you learn, and keep up with homework",
+      days:{monday:"Monday",tuesday:"Tuesday",wednesday:"Wednesday",thursday:"Thursday",friday:"Friday",saturday:"Saturday"},
+      subjects:{biochemistry:"Biochemistry",histology:"Histology",psychology:"Psychology",humanAnatomy:"Human Anatomy",microbiology:"Microbiology",hygiene:"Hygiene",normalPhysiology:"Normal Physiology"},
+      locations:{chorguzar:"Chorguzar",mainBuilding:"Main Building"},
+      periods:"periods",
+      learnedLabel:"What I learned today",
+      homeworkLabel:"Homework",
+      learnedPlaceholder:"What did you learn in this class today?",
+      homeworkPlaceholder:"Any homework or reading assigned?",
+      dateLabel:"Date",
+      scoreLabel:"Score",
+      scorePlaceholder:"e.g. 88/100",
+      save:"Save entry",
+      noEntries:"No entries yet — add your first one above.",
+      entriesHistory:"Entry history",
+      export:"Download backup",
+      import:"Restore backup",
+      sundayTitle:"No classes today",
+      sundayMessage:"Enjoy your day off! Pick any day above to review notes or get ahead on homework.",
+      savedToast:"Saved!",
+      importedToast:"Backup restored!",
+      importError:"That file could not be read as a backup."
+    },
+    uz:{
+      appTitle:"TFIG 248 guruhining haftalik dars jadvali 🥼📚",
+      appSubtitle:"Darslaringizni kuzating, o'rganganlaringiz va uy vazifalaringizni yozib boring",
+      days:{monday:"Dushanba",tuesday:"Seshanba",wednesday:"Chorshanba",thursday:"Payshanba",friday:"Juma",saturday:"Shanba"},
+      subjects:{biochemistry:"Biokimyo",histology:"Gistologiya",psychology:"Psixologiya",humanAnatomy:"Odam anatomiyasi",microbiology:"Mikrobiologiya",hygiene:"Gigiena",normalPhysiology:"Normal fiziologiya"},
+      locations:{chorguzar:"Chorguzar",mainBuilding:"Asosiy bino"},
+      periods:"para",
+      learnedLabel:"Bugun o'rganganlarim",
+      homeworkLabel:"Uy vazifasi",
+      learnedPlaceholder:"Ushbu darsda nimalarni o'rgandingiz?",
+      homeworkPlaceholder:"Uyga vazifa yoki o'qish uchun material berilganmi?",
+      dateLabel:"Sana",
+      scoreLabel:"Ball",
+      scorePlaceholder:"masalan, 88/100",
+      save:"Saqlash",
+      noEntries:"Hozircha yozuv yo'q — yuqorida birinchisini qo'shing.",
+      entriesHistory:"Yozuvlar tarixi",
+      export:"Zaxira nusxani yuklab olish",
+      import:"Zaxiradan tiklash",
+      sundayTitle:"Bugun dars yo'q",
+      sundayMessage:"Dam olish kuningizdan bahramand bo'ling! Yozuvlarni ko'rish yoki uy vazifasini oldindan qilish uchun yuqoridagi istalgan kunni tanlang.",
+      savedToast:"Saqlandi!",
+      importedToast:"Zaxira nusxa tiklandi!",
+      importError:"Bu faylni zaxira nusxa sifatida o'qib bo'lmadi."
+    },
+    ru:{
+      appTitle:"Еженедельное расписание занятий TFIG 248 🥼📚",
+      appSubtitle:"Отслеживайте занятия, записывайте выученное и домашние задания",
+      days:{monday:"Понедельник",tuesday:"Вторник",wednesday:"Среда",thursday:"Четверг",friday:"Пятница",saturday:"Суббота"},
+      subjects:{biochemistry:"Биохимия",histology:"Гистология",psychology:"Психология",humanAnatomy:"Анатомия человека",microbiology:"Микробиология",hygiene:"Гигиена",normalPhysiology:"Нормальная физиология"},
+      locations:{chorguzar:"Чоргузар",mainBuilding:"Главный корпус"},
+      periods:"пары",
+      learnedLabel:"Что я узнал(а) сегодня",
+      homeworkLabel:"Домашнее задание",
+      learnedPlaceholder:"Что вы узнали на этом занятии?",
+      homeworkPlaceholder:"Задали ли домашнее задание или материал для чтения?",
+      dateLabel:"Дата",
+      scoreLabel:"Балл",
+      scorePlaceholder:"например, 88/100",
+      save:"Сохранить запись",
+      noEntries:"Пока нет записей — добавьте первую выше.",
+      entriesHistory:"История записей",
+      export:"Скачать резервную копию",
+      import:"Восстановить из копии",
+      sundayTitle:"Сегодня занятий нет",
+      sundayMessage:"Наслаждайтесь выходным! Выберите любой день выше, чтобы просмотреть записи или сделать домашнее задание заранее.",
+      savedToast:"Сохранено!",
+      importedToast:"Резервная копия восстановлена!",
+      importError:"Не удалось прочитать этот файл как резервную копию."
+    }
+  };
+
+  var lang = localStorage.getItem("scheduleLang") || "uz";
+  var todayKey = (function(){
+    var map = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+    return map[new Date().getDay()];
+  })();
+  var activeDay = DAY_ORDER.indexOf(todayKey) !== -1 ? todayKey : "monday";
+
+  function t(key){
+    var parts = key.split(".");
+    var obj = I18N[lang];
+    for(var i=0;i<parts.length;i++){
+      if(obj == null) break;
+      obj = obj[parts[i]];
+    }
+    return obj != null ? obj : key;
+  }
+
+  function escapeHtml(str){
+    var div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function formatDate(iso){
+    var bits = iso.split("-");
+    var y = parseInt(bits[0],10), m = parseInt(bits[1],10), d = parseInt(bits[2],10);
+    return d + " " + MONTHS[lang][m-1] + " " + y;
+  }
+
+  function todayISO(){
+    var d = new Date();
+    var m = ("0"+(d.getMonth()+1)).slice(-2);
+    var day = ("0"+d.getDate()).slice(-2);
+    return d.getFullYear()+"-"+m+"-"+day;
+  }
+
+  function getEntries(){
+    try{
+      return JSON.parse(localStorage.getItem("scheduleEntries")) || {};
+    }catch(e){ return {}; }
+  }
+  function setEntries(data){
+    localStorage.setItem("scheduleEntries", JSON.stringify(data));
+  }
+
+  function showToast(msg){
+    var toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function(){ toast.classList.remove("show"); }, 1900);
+  }
+
+  window.saveEntry = function(day){
+    var dateEl = document.getElementById("entryDate");
+    var learnedEl = document.getElementById("entryLearned");
+    var homeworkEl = document.getElementById("entryHomework");
+    var scoreEl = document.getElementById("entryScore");
+    var learned = learnedEl.value.trim();
+    var homework = homeworkEl.value.trim();
+    var score = scoreEl.value.trim();
+    if(!learned && !homework && !score) return;
+    var entries = getEntries();
+    entries[day] = entries[day] || [];
+    entries[day].unshift({
+      id: Date.now(),
+      date: dateEl.value || todayISO(),
+      learned: learned,
+      homework: homework,
+      score: score
+    });
+    setEntries(entries);
+    renderPanel();
+    showToast(t("savedToast"));
+  };
+
+  window.deleteEntry = function(day, id){
+    var entries = getEntries();
+    entries[day] = (entries[day]||[]).filter(function(e){ return e.id !== id; });
+    setEntries(entries);
+    renderPanel();
+  };
+
+  function renderStatic(){
+    document.documentElement.lang = lang;
+    document.title = t("appTitle");
+    var nodes = document.querySelectorAll("[data-i18n]");
+    for(var i=0;i<nodes.length;i++){
+      nodes[i].textContent = t(nodes[i].getAttribute("data-i18n"));
+    }
+  }
+
+  function renderLangButtons(){
+    var btns = document.querySelectorAll(".lang-switch button");
+    for(var i=0;i<btns.length;i++){
+      btns[i].classList.toggle("active", btns[i].getAttribute("data-lang") === lang);
+    }
+  }
+
+  function renderRestBanner(){
+    var el = document.getElementById("restBanner");
+    if(todayKey === "sunday"){
+      el.style.display = "block";
+      el.innerHTML = "<strong>"+escapeHtml(t("sundayTitle"))+"</strong><p>"+escapeHtml(t("sundayMessage"))+"</p>";
+    } else {
+      el.style.display = "none";
+      el.innerHTML = "";
+    }
+  }
+
+  function renderTabs(){
+    var nav = document.getElementById("dayTabs");
+    nav.innerHTML = "";
+    for(var i=0;i<DAY_ORDER.length;i++){
+      (function(day){
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "day-tab" + (day===activeDay ? " active" : "") + (day===todayKey ? " is-today" : "");
+        btn.setAttribute("data-theme", day);
+        btn.textContent = t("days."+day);
+        btn.onclick = function(){ activeDay = day; renderAll(); };
+        nav.appendChild(btn);
+      })(DAY_ORDER[i]);
+    }
+  }
+
+  function renderPanel(){
+    var panel = document.getElementById("dayPanel");
+    panel.setAttribute("data-theme", activeDay);
+    var info = SCHEDULE[activeDay];
+
+    var subjectsHtml = info.subjects.map(function(s){
+      return '<div class="subject-card">'
+        + "<h3>"+escapeHtml(t("subjects."+s.key))+"</h3>"
+        + '<p class="t1">'+s.start+" – "+s.end+"</p>"
+        + '<p class="t2">'+s.periods+" "+escapeHtml(t("periods"))+"</p>"
+        + "</div>";
+    }).join("");
+
+    var entries = (getEntries()[activeDay]||[]).slice().sort(function(a,b){
+      if(a.date !== b.date) return a.date < b.date ? 1 : -1;
+      return b.id - a.id;
+    });
+
+    var entriesHtml;
+    if(entries.length === 0){
+      entriesHtml = '<p class="no-entries">'+escapeHtml(t("noEntries"))+"</p>";
+    } else {
+      entriesHtml = entries.map(function(e){
+        var fields = "";
+        if(e.learned){
+          fields += '<div class="entry-field"><b>'+EMOJI.learned+" "+escapeHtml(t("learnedLabel"))+":</b> <span>"+escapeHtml(e.learned)+"</span></div>";
+        }
+        if(e.homework){
+          fields += '<div class="entry-field"><b>'+EMOJI.homework+" "+escapeHtml(t("homeworkLabel"))+":</b> <span>"+escapeHtml(e.homework)+"</span></div>";
+        }
+        var scoreBadge = e.score ? '<span class="score-badge">'+EMOJI.score+" "+escapeHtml(e.score)+"</span>" : "";
+        return '<div class="entry-card">'
+          + '<button class="delete-btn" onclick="deleteEntry(\''+activeDay+"', "+e.id+')">\u00d7</button>'
+          + '<div class="entry-top"><span class="entry-date">'+formatDate(e.date)+"</span>"+scoreBadge+"</div>"
+          + fields
+          + "</div>";
+      }).join("");
+    }
+
+    panel.innerHTML =
+      '<div class="panel-icon">'+ICONS[activeDay]+"</div>"
+      + '<div class="panel-header"><h2>'+escapeHtml(t("days."+activeDay))+'</h2><p class="loc">\ud83d\udccd '+escapeHtml(t("locations."+info.location))+"</p></div>"
+      + '<div class="subjects">'+subjectsHtml+"</div>"
+      + '<div class="entry-form">'
+        + "<label>"+escapeHtml(t("dateLabel"))+'</label><input type="date" id="entryDate" value="'+todayISO()+'">'
+        + "<label>"+EMOJI.learned+" "+escapeHtml(t("learnedLabel"))+'</label><textarea id="entryLearned" placeholder="'+escapeHtml(t("learnedPlaceholder"))+'"></textarea>'
+        + "<label>"+EMOJI.homework+" "+escapeHtml(t("homeworkLabel"))+'</label><textarea id="entryHomework" placeholder="'+escapeHtml(t("homeworkPlaceholder"))+'"></textarea>'
+        + "<label>"+EMOJI.score+" "+escapeHtml(t("scoreLabel"))+'</label><input type="text" id="entryScore" placeholder="'+escapeHtml(t("scorePlaceholder"))+'">'
+        + '<button class="btn-save" type="button" onclick="saveEntry(\''+activeDay+'\')">'+escapeHtml(t("save"))+"</button>"
+      + "</div>"
+      + '<h3 class="history-title">'+escapeHtml(t("entriesHistory"))+"</h3>"
+      + '<div class="entries-list">'+entriesHtml+"</div>";
+  }
+
+  function renderAll(){
+    renderStatic();
+    renderLangButtons();
+    renderRestBanner();
+    renderTabs();
+    renderPanel();
+  }
+
+  function switchLang(newLang){
+    var learnedDraft = "", homeworkDraft = "", scoreDraft = "";
+    var le = document.getElementById("entryLearned");
+    var he = document.getElementById("entryHomework");
+    var se = document.getElementById("entryScore");
+    if(le) learnedDraft = le.value;
+    if(he) homeworkDraft = he.value;
+    if(se) scoreDraft = se.value;
+    lang = newLang;
+    localStorage.setItem("scheduleLang", lang);
+    renderAll();
+    le = document.getElementById("entryLearned");
+    he = document.getElementById("entryHomework");
+    se = document.getElementById("entryScore");
+    if(le) le.value = learnedDraft;
+    if(he) he.value = homeworkDraft;
+    if(se) se.value = scoreDraft;
+  }
+
+  var langBtns = document.querySelectorAll(".lang-switch button");
+  for(var i=0;i<langBtns.length;i++){
+    langBtns[i].addEventListener("click", function(){
+      switchLang(this.getAttribute("data-lang"));
+    });
+  }
+
+  document.getElementById("exportBtn").addEventListener("click", function(){
+    var data = { entries: getEntries(), lang: lang, exportedAt: todayISO() };
+    var blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "dars-jadvali-backup.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById("importInput").addEventListener("change", function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var data = JSON.parse(reader.result);
+        if(data.entries) setEntries(data.entries);
+        if(data.lang && I18N[data.lang]) {
+          lang = data.lang;
+          localStorage.setItem("scheduleLang", lang);
+        }
+        renderAll();
+        showToast(t("importedToast"));
+      }catch(err){
+        alert(t("importError"));
+      }
+      e.target.value = "";
+    };
+    reader.readAsText(file);
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
