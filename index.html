@@ -247,14 +247,14 @@
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
   [data-theme="monday"]{--accent:#5eead4;background:linear-gradient(160deg,#0a2c2a 0%,#0f4c46 55%,#0d6d63 100%);}
-  [data-theme="tuesday"]{--accent:#fb7185;background:linear-gradient(160deg,#3f0f2e 0%,#7a1e6b 45%,#4338ca 100%);}
+  [data-theme="tuesday"]{--accent:#a5b4fc;background:linear-gradient(160deg,#0f1044 0%,#2d1b69 50%,#4338ca 100%);}
   [data-theme="wednesday"]{--accent:#fbbf24;background:linear-gradient(160deg,#3d0a0a 0%,#6d1414 50%,#8a2a1f 100%);}
   [data-theme="thursday"]{--accent:#a3e635;background:linear-gradient(160deg,#1a1033 0%,#3f1f6b 50%,#14532d 100%);}
-  [data-theme="friday"]{--accent:#7dd3fc;background:linear-gradient(160deg,#062a3f 0%,#0c5478 50%,#1691c7 100%);}
+  [data-theme="friday"]{--accent:#7dd3fc;background:linear-gradient(160deg,#062a3f 0%,#0c5478 40%,#7a1e6b 100%);}
   [data-theme="saturday"]{--accent:#fdba74;background:linear-gradient(160deg,#4a1607 0%,#8a2e0d 50%,#c2540f 100%);}
 
   .day-tab[data-theme="monday"]{--tab-c:#5eead4;}
-  .day-tab[data-theme="tuesday"]{--tab-c:#fb7185;}
+  .day-tab[data-theme="tuesday"]{--tab-c:#a5b4fc;}
   .day-tab[data-theme="wednesday"]{--tab-c:#fbbf24;}
   .day-tab[data-theme="thursday"]{--tab-c:#a3e635;}
   .day-tab[data-theme="friday"]{--tab-c:#7dd3fc;}
@@ -298,11 +298,11 @@
 
   var SCHEDULE = {
     monday:    { location:"chorguzar",    subjects:[{key:"biochemistry",    start:"8:00",  end:"10:50", periods:2}] },
-    tuesday:   { location:"chorguzar",    subjects:[{key:"histology",       start:"8:00",  end:"10:50", periods:2},
-                                                     {key:"psychology",      start:"11:50", end:"13:20", periods:2}] },
+    tuesday:   { location:"chorguzar",    subjects:[{key:"psychology",      start:"11:50", end:"13:20", periods:2}] },
     wednesday: { location:"mainBuilding", subjects:[{key:"humanAnatomy",    start:"8:00",  end:"10:50", periods:2}] },
     thursday:  { location:"chorguzar",    subjects:[{key:"microbiology",    start:"8:00",  end:"10:50", periods:2}] },
-    friday:    { location:"chorguzar",    subjects:[{key:"hygiene",         start:"8:00",  end:"10:50", periods:2}] },
+    friday:    { location:"chorguzar",    subjects:[{key:"hygiene",         start:"8:00",  end:"10:50", periods:2},
+                                                     {key:"histology",       start:"11:50", end:"13:20", periods:2}] },
     saturday:  { location:"mainBuilding", subjects:[{key:"normalPhysiology",start:"8:00",  end:"10:50", periods:2}] }
   };
 
@@ -310,10 +310,10 @@
 
   var ICONS = {
     monday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="28" r="9"/><circle cx="70" cy="28" r="9"/><circle cx="50" cy="62" r="9"/><circle cx="18" cy="66" r="6"/><circle cx="82" cy="66" r="6"/><line x1="30" y1="28" x2="70" y2="28"/><line x1="30" y1="28" x2="50" y2="62"/><line x1="70" y1="28" x2="50" y2="62"/><line x1="50" y1="62" x2="18" y2="66"/><line x1="50" y1="62" x2="82" y2="66"/></svg>',
-    tuesday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5"><circle cx="35" cy="32" r="22"/><circle cx="35" cy="32" r="6" fill="currentColor" stroke="none"/><circle cx="70" cy="55" r="18"/><circle cx="70" cy="55" r="5" fill="currentColor" stroke="none"/><circle cx="32" cy="75" r="13"/><circle cx="32" cy="75" r="4" fill="currentColor" stroke="none"/></svg>',
+    tuesday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round"><line x1="50" y1="40" x2="50" y2="90"/><path d="M20 16 C20 48, 38 58, 50 58 C62 58, 80 48, 80 16"/></svg>',
     wednesday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"><path d="M50 88 C22 64 6 44 6 27 C6 11 20 2 33 6 C43 9 49 18 50 26 C51 18 57 9 67 6 C80 2 94 11 94 27 C94 44 78 64 50 88 Z"/></svg>',
     thursday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><ellipse cx="32" cy="38" rx="20" ry="13" transform="rotate(-18 32 38)"/><ellipse cx="68" cy="60" rx="15" ry="10" transform="rotate(20 68 60)"/><circle cx="78" cy="26" r="7"/><line x1="18" y1="30" x2="8" y2="20"/><line x1="20" y1="42" x2="8" y2="48"/><line x1="60" y1="72" x2="55" y2="82"/></svg>',
-    friday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"><path d="M50 6 C50 6 78 46 78 66 C78 84 65 94 50 94 C35 94 22 84 22 66 C22 46 50 6 50 6 Z"/><line x1="78" y1="20" x2="86" y2="20"/><line x1="82" y1="16" x2="82" y2="24"/></svg>',
+    friday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"><path d="M38 6 C38 6 60 38 60 54 C60 68 50 76 38 76 C26 76 16 68 16 54 C16 38 38 6 38 6 Z"/><circle cx="72" cy="50" r="14"/><circle cx="72" cy="50" r="4" fill="currentColor" stroke="none"/><circle cx="80" cy="78" r="9"/><circle cx="80" cy="78" r="3" fill="currentColor" stroke="none"/></svg>',
     saturday: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,54 24,54 32,32 42,74 52,18 60,54 96,54"/></svg>'
   };
 
